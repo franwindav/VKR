@@ -1,0 +1,6 @@
+emg_data/
+lm.binary
+cenv/
+__pycache__/
+emg_data.tar.gz
+ctcdecode/
