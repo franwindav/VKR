@@ -34,4 +34,4 @@
 
 Основные ключи:
 - ```--output_directory "path/to/output"``` путь где будет сохраняться модель и логи
-- ```start_training_from_model True or False``` начать обучение с существующей моделилежащей в output_directory 
+- ```start_training_from_model True or False``` начать обучение с существующей модели лежащей в output_directory 
