@@ -1,4 +1,4 @@
-name: /home/franwindav/workspace/VKR/cenv
+name: ./cenv
 channels:
   - pytorch
   - defaults
