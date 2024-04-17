@@ -133,8 +133,7 @@ def train_model(trainset, devset, device, n_epochs=200):
     return model
 
 def evaluate_saved():
-    # device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    device = 'cpu'
+    device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
     testset = EMGDataset(test=True)
     n_chars = len(testset.text_transform.chars)
     model = Model(testset.num_features, n_chars+1).to(device)
