@@ -40,7 +40,7 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs):
+    def __init__(self, num_outs):
         super().__init__()
 
         self.conv_blocks = nn.Sequential(
