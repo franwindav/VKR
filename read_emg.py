@@ -10,7 +10,6 @@ import pickle
 import string
 import logging
 from functools import lru_cache
-from copy import copy
 
 import torch
 import matplotlib.pyplot as plt
@@ -74,7 +73,7 @@ def apply_to_all(function, signal_array, *args, **kwargs):
 
 
 def load_utterance(
-    base_dir, index, debug=True
+    base_dir, index, debug=False
 ):
     index = int(index)
     raw_emg = np.load(os.path.join(base_dir, f"{index}_emg.npy"))
@@ -121,7 +120,6 @@ def load_utterance(
     return (
         emg_features,
         info["text"],
-        (info["book"], info["sentence_index"]),
         emg_orig.astype(np.float32),
     )
 
@@ -169,7 +167,6 @@ class SizeAwareSampler(torch.utils.data.Sampler):
                 batch_length = 0
             batch.append(idx)
             batch_length += length
-        # dropping last incomplete batch
 
 
 class EMGDataset(torch.utils.data.Dataset):
@@ -218,7 +215,6 @@ class EMGDataset(torch.utils.data.Dataset):
                     )
 
         self.example_indices = []
-        self.voiced_data_locations = {}  # map from book/sentence_index to directory_info/index
         for directory_info in directories:
             for fname in os.listdir(directory_info.directory):
                 m = re.match(r"(\d+)_info.json", fname)
@@ -269,7 +265,7 @@ class EMGDataset(torch.utils.data.Dataset):
                 open(FLAGS.normalizers_file, "rb")
             )
 
-        sample_emg, _, _, _ = load_utterance(
+        sample_emg, _, _ = load_utterance(
             self.example_indices[0][0].directory, self.example_indices[0][1]
         )
         self.num_features = sample_emg.shape[1]
@@ -300,7 +296,7 @@ class EMGDataset(torch.utils.data.Dataset):
     @lru_cache(maxsize=None)
     def __getitem__(self, i):
         directory_info, idx = self.example_indices[i]
-        emg, text, book_location, raw_emg = load_utterance(
+        emg, text, raw_emg = load_utterance(
             directory_info.directory,
             idx,
         )
@@ -311,20 +307,12 @@ class EMGDataset(torch.utils.data.Dataset):
             emg = self.emg_norm.normalize(emg)
             emg = 8 * np.tanh(emg / 8.0)
 
-        session_ids = np.full(
-            emg.shape[0], directory_info.session_index, dtype=np.int64
-        )
-
         text_int = np.array(self.text_transform.text_to_int(text), dtype=np.int64)
 
         result = {
             "emg": torch.from_numpy(emg),
             "text": text,
             "text_int": torch.from_numpy(text_int),
-            "file_label": idx,
-            "session_ids": torch.from_numpy(session_ids),
-            "book_location": book_location,
-            "silent": directory_info.silent,
             "raw_emg": torch.from_numpy(raw_emg),
         }
 
@@ -332,40 +320,33 @@ class EMGDataset(torch.utils.data.Dataset):
 
     @staticmethod
     def collate_raw(batch):
-        batch_size = len(batch)
         emg = [ex["emg"] for ex in batch]
         raw_emg = [ex["raw_emg"] for ex in batch]
-        session_ids = [ex["session_ids"] for ex in batch]
         lengths = [ex["emg"].shape[0] for ex in batch]
-        silent = [ex["silent"] for ex in batch]
         text_ints = [ex["text_int"] for ex in batch]
         text_lengths = [ex["text_int"].shape[0] for ex in batch]
 
         result = {
             "emg": emg,
             "raw_emg": raw_emg,
-            "session_ids": session_ids,
             "lengths": lengths,
-            "silent": silent,
             "text_int": text_ints,
             "text_int_lengths": text_lengths,
         }
         return result
 
-
 def make_normalizers():
     dataset = EMGDataset(no_normalizers=True)
     emg_samples = []
     for d in dataset:
-        emg_samples.append(d["emg"])
+    # d[0]
+        emg_samples.append(d['emg'])
         if len(emg_samples) > 50:
             break
     emg_norm = FeatureNormalizer(emg_samples, share_scale=False)
-    pickle.dump(emg_norm, open(FLAGS.normalizers_file, "wb"))
-
+    pickle.dump(emg_norm, open(FLAGS.normalizers_file, 'wb'))
 
 if __name__ == "__main__":
     FLAGS(sys.argv)
     d = EMGDataset()
-    # d[0]
-    # make_normalizers()
+    make_normalizers()

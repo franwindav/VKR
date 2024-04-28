@@ -1,5 +1,3 @@
-import random
-
 from torch import nn
 import torch.nn.functional as F
 
@@ -56,15 +54,9 @@ class Model(nn.Module):
         self.transformer = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs)
 
-    def forward(self, x_feat, x_raw, session_ids):
+    def forward(self, x_raw):
         # x shape is (batch, time, electrode)
-
-        if self.training:
-            r = random.randrange(8)
-            if r > 0:
-                x_raw[:,:-r,:] = x_raw[:,r:,:] # shift left r
-                x_raw[:,-r:,:] = 0
-
+        
         x_raw = x_raw.transpose(1,2) # put channel before time for conv
         x_raw = self.conv_blocks(x_raw)
         x_raw = x_raw.transpose(1,2)

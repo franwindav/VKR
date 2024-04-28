@@ -48,13 +48,11 @@ def test(model, testset, device):
     predictions = []
     with torch.no_grad():
         for example in tqdm.tqdm(dataloader, "Evaluate", disable=None):
-            X = example["emg"].to(device)
             X_raw = example["raw_emg"].to(device)
-            sess = example["session_ids"].to(device)
 
-            pred = F.log_softmax(model(X, X_raw, sess), -1)
+            pred = F.log_softmax(model(X_raw), -1)
 
-            beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
+            beam_results, _, _, out_lens = decoder.decode(pred)
             pred_int = beam_results[0, 0, : out_lens[0, 0]].tolist()
 
             pred_text = testset.text_transform.int_to_text(pred_int)
@@ -116,15 +114,14 @@ def train_model(trainset, devset, device, n_epochs=200):
         losses = []
         # INFO: display progress for learning
         for example in tqdm.tqdm(dataloader, "Train step", disable=None):
+
             # INFO: set learning rate for curent step
             schedule_lr(batch_idx)
 
             # INFO: load data to memory
-            X = combine_fixed_length(example["emg"], 200).to(device)
             X_raw = combine_fixed_length(example["raw_emg"], 200 * 8).to(device)
-            sess = combine_fixed_length(example["session_ids"], 200).to(device)
 
-            pred = model(X, X_raw, sess)
+            pred = model(X_raw)
             pred = F.log_softmax(pred, 2)
 
             # INFO: seq first, as required by ctc

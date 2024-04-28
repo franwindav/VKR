@@ -113,7 +113,6 @@ class MultiHeadAttention(nn.Module):
     return out
 
 class LearnedRelativePositionalEmbedding(nn.Module):
-    # from https://github.com/pytorch/fairseq/pull/2225/commits/a7fb63f2b84d5b20c8855e9c3372a95e5d0ea073
     """
     This module learns relative positional embeddings up to a fixed
     maximum size. These are masked for decoder and unmasked for encoder

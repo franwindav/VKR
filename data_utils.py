@@ -20,7 +20,7 @@ def double_average(x):
     w = np.convolve(v, f, mode='same')
     return w
 
-def get_emg_features(emg_data, debug=True):
+def get_emg_features(emg_data, debug=False):
     xs = emg_data - emg_data.mean(axis=0, keepdims=True)
     frame_features = []
     for i in range(emg_data.shape[1]):
