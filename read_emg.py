@@ -93,6 +93,18 @@ def load_utterance(
     x = apply_to_all(notch_harmonics, x, 60, 1000)
     x = apply_to_all(remove_drift, x, 1000)
     x = x[raw_emg_before.shape[0] : x.shape[0] - raw_emg_after.shape[0], :]
+
+    if debug:
+        plt.subplot(2,1,1)
+        plt.title("До оброботки")
+        plt.plot(raw_emg[:,0])
+        plt.subplot(2,1,2)
+        plt.title("После оброботки")
+        plt.plot(x[:,0])
+        plt.show()
+
+
+
     emg_orig = apply_to_all(subsample, x, 689.06, 1000)
 
     x = apply_to_all(subsample, x, 516.79, 1000)
@@ -103,17 +115,7 @@ def load_utterance(
         emg_orig[:, int(c)] = 0
 
     emg_features = get_emg_features(emg)
-
     
-    if debug:
-        plt.subplot(2,1,1)
-        plt.title("До оброботки")
-        plt.plot(raw_emg[:,0])
-        plt.subplot(2,1,2)
-        plt.title("После оброботки")
-        plt.plot(x[:,0])
-        plt.show()
-
     with open(os.path.join(base_dir, f"{index}_info.json")) as f:
         info = json.load(f)
 

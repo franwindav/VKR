@@ -1,0 +1,24 @@
+\begin{mintedbox}[]{python}{Класс, реализующий сверточный блок}{code:feature}
+class ResBlock(nn.Module):
+    def __init__(self, num_ins, num_outs, stride=1):
+        super().__init__()
+        self.conv1 = nn.Conv1d(num_ins, num_outs, 3, padding=1, stride=stride)
+        self.bn1 = nn.BatchNorm1d(num_outs)
+        self.conv2 = nn.Conv1d(num_outs, num_outs, 3, padding=1)
+        self.bn2 = nn.BatchNorm1d(num_outs)
+        if stride != 1 or num_ins != num_outs:
+            self.residual_path = nn.Conv1d(num_ins, num_outs, 1, stride=stride)
+            self.res_norm = nn.BatchNorm1d(num_outs)
+        else:
+            self.residual_path = None
+
+    def forward(self, x):
+        input_value = x
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = self.bn2(self.conv2(x))
+        if self.residual_path is not None:
+            res = self.res_norm(self.residual_path(input_value))
+        else:
+            res = input_value
+        return F.relu(x + res)
+\end{mintedbox}

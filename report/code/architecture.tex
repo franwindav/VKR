@@ -1,0 +1,33 @@
+\begin{mintedbox}[]{python}{Класс, реализующий архитектуру модели}{code:architecture}
+class Model(nn.Module):
+    def __init__(self, num_outs):
+        super().__init__()
+        self.conv_blocks = nn.Sequential(
+            ResBlock(8, FLAGS.model_size, 2),
+            ResBlock(FLAGS.model_size, FLAGS.model_size, 2),
+            ResBlock(FLAGS.model_size, FLAGS.model_size, 2),
+        )
+        self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
+        encoder_layer = TransformerEncoderLayer(
+            d_model=FLAGS.model_size,
+            nhead=8,
+            relative_positional=True,
+            relative_positional_distance=100,
+            dim_feedforward=3072,
+            dropout=FLAGS.dropout,
+        )
+        self.transformer = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
+        self.w_out = nn.Linear(FLAGS.model_size, num_outs)
+
+    def forward(self, x_raw):
+        x_raw = x_raw.transpose(1, 2)
+        x_raw = self.conv_blocks(x_raw)
+        x_raw = x_raw.transpose(1, 2)
+        x_raw = self.w_raw_in(x_raw)
+        x = x_raw
+        x = x.transpose(0, 1)
+        x = self.transformer(x)
+        x = x.transpose(0, 1)
+        return self.w_out(x)
+\end{mintedbox}
+

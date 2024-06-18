@@ -1,0 +1,285 @@
+\usepackage{ucs}                            % позволяет использовать utf8x
+\usepackage[utf8x]{inputenc}                % кодовая страница документа
+\usepackage[english, russian]{babel}        % локализация и переносы
+\usepackage[usenames,dvipsnames]{color}     % названия цветов
+\usepackage{hyperref}
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% ----------------------------------------------------------------------------------------------------
+
+% Настрока текста
+\usepackage{ulem}
+\usepackage{fontspec}
+\usepackage{ragged2e}
+\usepackage{fontsize}
+\usepackage{indentfirst}                                % русский стиль: отступ первого абзаца раздела
+\setmainfont{Times New Roman}                           % задание шрифта 
+\changefontsize[21]{14}                                 % задает размер шрифта и расстояние между строками
+\renewcommand{\footnotesize}{\changefontsize[13.5]{11}} % заданет размер шрифта для сносок
+\renewcommand{\small}{\changefontsize[18]{12}}          % заданет размер шрифта для сносок
+\newcommand{\urule}{\xleaders\hbox{\uline{ }}\hfill\kern0pt}
+
+% ----------------------------------------------------------------------------------------------------
+
+% Оформление заголовков
+\usepackage[compact,explicit]{titlesec}
+\titleformat{\section}{}{}{0mm}{\centering\textbf{\thesection\ \uppercase{#1}}}
+\titleformat{\subsection}[block]{\vspace{1em}}{}{0mm}{\centering\textbf{\thesubsection\ #1}}
+\titleformat{\subsubsection}[block]{\vspace{1em}\normalsize}{}{0mm}{\centering\textbf{\thesubsubsection\ #1}}
+\titleformat{\paragraph}[block]{\vspace{1em}\normalsize}{}{0mm}{\centering\textbf{\theparagraph\ #1}}
+\titleformat{\subparagraph}[block]{\normalsize}{}{0mm}{\centering#1}
+\setcounter{secnumdepth}{4}
+
+% Содержание
+\usepackage{tocloft}
+\renewcommand{\cfttoctitlefont}{\hspace{0.38\textwidth}\MakeTextUppercase}  % СОДЕРЖАНИЕ
+\renewcommand{\cftdot}{.}                                                   % Разделитель 
+\renewcommand{\cftdotsep}{2}                                                % Частота разделителей
+\renewcommand\cftsecleader{\cftdotfill{\cftdotsep}}                         % Точки для секций в содержании
+\renewcommand{\cftsecaftersnum}{.}                                          % Чтобы стояла точка после цифры
+\setlength{\cftsecnumwidth}{1em}                                            % ширина для цифр у подраздела
+\setlength{\cftsubsecnumwidth}{2em}                                         % ширина для цифр у подраздела
+\renewcommand\cftsecpagefont{\mdseries}                                     % Номера страниц не жирные
+\renewcommand{\cftsecfont}{\hspace{0pt}}                                    % Имена секций в содержании не жирным шрифтом
+\setcounter{tocdepth}{3}                                                    % Глубина оглавления, до subsubsection
+\makeatletter                                                               % Расстояние от разделителей до конца строки
+    \renewcommand{\@pnumwidth}{0.5cm}
+\makeatother
+
+
+% Заголовки секций в оглавлении в верхнем регистре
+\usepackage{textcase}
+\makeatletter
+\let\oldcontentsline\contentsline
+\def\contentsline#1#2{
+    \expandafter\ifx\csname l@#1\endcsname\l@section
+        \expandafter\@firstoftwo
+    \else
+        \expandafter\@secondoftwo
+    \fi
+    {\oldcontentsline{#1}{\MakeTextUppercase{#2}}}
+    {\oldcontentsline{#1}{#2}}
+}
+\makeatother
+
+
+% Секции без номеров (введение, заключение...), вместо section*{}
+\newcommand{\anonsection}[1]{
+    \phantomsection % Корректный переход по ссылкам в содержании
+    \addcontentsline{toc}{section}{\uppercase{#1}}
+    \subparagraph{\centerline{\normalfont\uppercase{#1}}}
+}
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Библиотки для математики
+\usepackage{amssymb,amsfonts,amsmath,amsthm}    % математические дополнения от амс
+\usepackage{mathtools}                          % прямое указание типа дробей и прочее
+\usepackage{physics}                            % полезный пакет с макетами формул, сокращает код
+\usepackage{cancel}                             % позволяет использовать зачеркивание
+\usepackage{stackrel}
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Графика
+\usepackage{graphicx}                               % Работа с графикой \includegraphics{}
+\graphicspath{ {./img/} }
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Настройка таблицы
+\usepackage{multirow} % Сложные таблицы
+\usepackage{longtable}
+\usepackage{etoolbox}
+\usepackage{tabularx}
+\usepackage{makecell}
+
+\newcounter{magicrownum}
+\preto{\longtable}{\setcounter{magicrownum}{0}}
+\preto{\table}{\setcounter{magicrownum}{0}}
+\newcommand{\rownum}{\stepcounter{magicrownum}\arabic{magicrownum}}
+
+\usepackage[dvipsnames,table]{xcolor}
+\definecolor{clr:1}{HTML}{f5f5f5}
+\definecolor{clr:2}{HTML}{f0f8ff}
+\definecolor{clr:3}{HTML}{f8f4ff}
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Настройка листинга кода
+\usepackage{pythonhighlight}
+\usepackage{tcolorbox}
+\tcbuselibrary{minted,breakable,xparse,skins,listings}
+
+\definecolor{bg}{gray}{0.97}
+\newtcblisting{mintedbox}[4][]{
+    breakable=true,
+    listing engine=minted,
+    listing only,
+    minted language=#2,
+    minted style=default,
+    minted options={
+        linenos,
+        gobble=0,
+        tabsize=2,
+        breaklines=true,
+        breakanywhere=true,
+        fontsize=\small,
+        numbersep=17pt,
+        mathescape
+    },
+    boxsep=0pt,
+    left skip=0pt,
+    right skip=0pt,
+    left=5pt,
+    right=25pt,
+    top=5pt,
+    bottom=5pt,
+    arc=10pt,
+    leftrule=2pt,
+    rightrule=0pt,
+    bottomrule=2pt,
+    toprule=3pt,
+    enlarge top by=1.5em,
+    enlarge top at break by=0em,
+    colback=bg,
+    colframe=orange!70,
+    enhanced,
+    overlay = {
+        \begin{tcbclipinterior}
+            \fill[orange!20!white] (frame.south west) rectangle ([xshift=20pt]frame.north west);
+        \end{tcbclipinterior}
+    },
+    overlay middle and last ={
+        \begin{tcbclipinterior}
+            \fill[orange!20!white] (frame.south west) rectangle ([xshift=20pt]frame.north west);
+        \end{tcbclipinterior} 
+    },
+    attach boxed title to bottom center,
+    minipage boxed title,
+    boxed title style={blanker},
+    title={\vspace{1em}\fontfamily{Times New Roman}\fontsize{18}{12}\captionof{figure}{#3\label{#4}}},
+}
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Оформление подписей под объектами (формулы, картинки, таблицы и т.д.)
+\usepackage{chngcntr}
+\RequirePackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+
+\numberwithin{equation}{section}
+\counterwithin{figure}{section}
+
+%Формат подписей
+\captionsetup[figure]{
+    justification=centering, 
+    labelsep=endash, 
+    format=plain, 
+    font=small,
+    belowskip=-0.5em,
+}
+                                                                                    % Подпись таблицы слева
+\captionsetup[table]{
+    justification=raggedright, 
+    labelsep=endash, 
+    format=plain, 
+    singlelinecheck=false, 
+    font=small,
+    belowskip=0.5em,
+} 
+
+\captionsetup[lstlisting]{
+    justification=raggedright, 
+    labelsep=endash, 
+    format=plain, 
+    singlelinecheck=false, 
+    font=small, 
+    belowskip=1em,
+} 
+\addto\captionsrussian{\renewcommand{\figurename}{Рисунок}}                         % Имя фигуры
+
+
+
+% Оформление библиографии и подрисуночных записей через точку
+\makeatletter
+\renewcommand*{\@biblabel}[1]{\hfill#1.}
+\renewcommand*\l@section{\@dottedtocline{1}{1em}{1em}}
+\renewcommand{\thefigure}{\thesection.\arabic{figure}} % Формат рисунка секция.номер
+\renewcommand{\thetable}{\thesection.\arabic{table}} % Формат таблицы секция.номер
+\def\redeflsection{\def\l@section{\@dottedtocline{1}{0em}{10em}}}
+\makeatother
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Пользовательские функции
+\usepackage{float}
+                % Добавление одного рисунка
+\newcommand{\addimg}[4]{ 
+    \begin{figure}
+        \centering
+        \includegraphics*[width=#2\linewidth]{#1}
+        \caption{#3} \label{#4}
+    \end{figure}
+}
+
+\newcommand{\addimgh}[4]{ % Добавить рисунок непосредственно в это место
+    \begin{figure}[H]
+        \centering
+        \includegraphics*[width=#2\linewidth]{#1}
+        \caption{#3} \label{#4}
+    \end{figure}
+}
+
+
+% ----------------------------------------------------------------------------------------------------
+
+
+% Поля и отступы
+\usepackage{geometry} % задаёт поля 
+\usepackage{enumitem}
+
+\setlist[itemize]{nosep}
+
+\setlength{\floatsep}{0em}          % отступ 
+\setlength{\textfloatsep}{2.5em}      % отступ от текста если в начале страницы
+\setlength{\intextsep}{1em}         % отступ в середине страницы
+
+\setlength\parskip{0.8em plus 0.2em minus 0.5em}
+\setlength{\parindent}{1.25cm}                          % задает абзацный отступ
+
+\geometry{left=3cm} % левое — 3 см
+\geometry{right= 1.5cm} % правое — 1,5 см
+\geometry{top=2cm} % верхнее — 2 см
+\geometry{bottom=2cm} % нижнее — 2 см
+
+\clubpenalties 6 10000 10000 10000 5000 1000 0
+\widowpenalties 4 10000 5000 1000 0 
+\relpenalty 10000
+
+
+\usepackage{etoolbox}
+\apptocmd\normalsize{
+    \abovedisplayskip=1.3em plus 0.3em minus 0.3em
+    \belowdisplayskip=1.3em plus 0.3em minus 0.3em
+    \abovedisplayshortskip=1.3em plus 0.3em minus 0.3em
+    \belowdisplayshortskip=1.3em plus 0.3em minus 0.3em
+}{}{}
+
+
+

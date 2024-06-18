@@ -1,0 +1,24 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{class} \PYG{n+nc}{ResBlock}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Module}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{num\PYGZus{}ins}\PYG{p}{,} \PYG{n}{num\PYGZus{}outs}\PYG{p}{,} \PYG{n}{stride}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv1} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{n}{num\PYGZus{}ins}\PYG{p}{,} \PYG{n}{num\PYGZus{}outs}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{stride}\PYG{o}{=}\PYG{n}{stride}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bn1} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{n}{num\PYGZus{}outs}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv2} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{n}{num\PYGZus{}outs}\PYG{p}{,} \PYG{n}{num\PYGZus{}outs}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bn2} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{n}{num\PYGZus{}outs}\PYG{p}{)}
+        \PYG{k}{if} \PYG{n}{stride} \PYG{o}{!=} \PYG{l+m+mi}{1} \PYG{o+ow}{or} \PYG{n}{num\PYGZus{}ins} \PYG{o}{!=} \PYG{n}{num\PYGZus{}outs}\PYG{p}{:}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{residual\PYGZus{}path} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{n}{num\PYGZus{}ins}\PYG{p}{,} \PYG{n}{num\PYGZus{}outs}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{stride}\PYG{o}{=}\PYG{n}{stride}\PYG{p}{)}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{res\PYGZus{}norm} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{n}{num\PYGZus{}outs}\PYG{p}{)}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{residual\PYGZus{}path} \PYG{o}{=} \PYG{k+kc}{None}
+
+    \PYG{k}{def} \PYG{n+nf}{forward}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{x}\PYG{p}{):}
+        \PYG{n}{input\PYGZus{}value} \PYG{o}{=} \PYG{n}{x}
+        \PYG{n}{x} \PYG{o}{=} \PYG{n}{F}\PYG{o}{.}\PYG{n}{relu}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bn1}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv1}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)))}
+        \PYG{n}{x} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bn2}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv2}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}
+        \PYG{k}{if} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{residual\PYGZus{}path} \PYG{o+ow}{is} \PYG{o+ow}{not} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{n}{res} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{res\PYGZus{}norm}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{residual\PYGZus{}path}\PYG{p}{(}\PYG{n}{input\PYGZus{}value}\PYG{p}{))}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{n}{res} \PYG{o}{=} \PYG{n}{input\PYGZus{}value}
+        \PYG{k}{return} \PYG{n}{F}\PYG{o}{.}\PYG{n}{relu}\PYG{p}{(}\PYG{n}{x} \PYG{o}{+} \PYG{n}{res}\PYG{p}{)}
+\end{Verbatim}

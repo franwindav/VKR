@@ -4,3 +4,7 @@ cenv/
 __pycache__/
 emg_data.tar.gz
 ctcdecode/
+*.log
+*.out
+*.aux
+*.toc

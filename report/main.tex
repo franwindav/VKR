@@ -1,0 +1,48 @@
+\documentclass[a4paper]{extarticle}
+
+\usepackage{preamble} % файл с пакетами и настроками
+
+\includeonly{
+    "parts/title",
+    "parts/response",
+    "parts/task",
+    "parts/report",
+    "parts/abbreviation",
+    "parts/introduction",
+    "parts/basic",
+    "parts/conclusion",
+    "parts/literature",
+    "parts/handout_material",
+    "parts/presentation"
+}
+
+\begin{document}
+
+% \newgeometry{top=1.5cm, bottom=1.5cm, left=2cm, right=1.5cm}
+
+% \include{"parts/title"}
+% \include{"parts/task"}
+% \include{"parts/response"}
+%
+% \newpage
+%
+% \newgeometry{top=2cm, bottom=2cm, left=3cm, right=1.5cm}
+%
+\include{"parts/report"}
+%
+\renewcommand*{\contentsname}{\uppercase{Содержание}}
+\tableofcontents
+%
+\include{"parts/abbreviation"}
+\include{"parts/introduction"}
+\include{"parts/basic"}
+\include{"parts/conclusion"}
+\include{"parts/literature"}
+%
+%
+% \newgeometry{top=1.5cm, bottom=1.5cm, left=2cm, right=1.5cm}
+%
+% \include{"parts/handout_material"}
+% \include{"parts/presentation"}
+
+\end{document}

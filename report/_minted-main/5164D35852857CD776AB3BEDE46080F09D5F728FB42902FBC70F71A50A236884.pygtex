@@ -1,0 +1,32 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{class} \PYG{n+nc}{Model}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Module}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{num\PYGZus{}outs}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv\PYGZus{}blocks} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{ResBlock}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{,} \PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{),}
+            \PYG{n}{ResBlock}\PYG{p}{(}\PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{),}
+            \PYG{n}{ResBlock}\PYG{p}{(}\PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{),}
+        \PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{w\PYGZus{}raw\PYGZus{}in} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{)}
+        \PYG{n}{encoder\PYGZus{}layer} \PYG{o}{=} \PYG{n}{TransformerEncoderLayer}\PYG{p}{(}
+            \PYG{n}{d\PYGZus{}model}\PYG{o}{=}\PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,}
+            \PYG{n}{nhead}\PYG{o}{=}\PYG{l+m+mi}{8}\PYG{p}{,}
+            \PYG{n}{relative\PYGZus{}positional}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,}
+            \PYG{n}{relative\PYGZus{}positional\PYGZus{}distance}\PYG{o}{=}\PYG{l+m+mi}{100}\PYG{p}{,}
+            \PYG{n}{dim\PYGZus{}feedforward}\PYG{o}{=}\PYG{l+m+mi}{3072}\PYG{p}{,}
+            \PYG{n}{dropout}\PYG{o}{=}\PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{dropout}\PYG{p}{,}
+        \PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transformer} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{TransformerEncoder}\PYG{p}{(}\PYG{n}{encoder\PYGZus{}layer}\PYG{p}{,} \PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{num\PYGZus{}layers}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{w\PYGZus{}out} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{n}{FLAGS}\PYG{o}{.}\PYG{n}{model\PYGZus{}size}\PYG{p}{,} \PYG{n}{num\PYGZus{}outs}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{forward}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{x\PYGZus{}raw}\PYG{p}{):}
+        \PYG{n}{x\PYGZus{}raw} \PYG{o}{=} \PYG{n}{x\PYGZus{}raw}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{n}{x\PYGZus{}raw} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv\PYGZus{}blocks}\PYG{p}{(}\PYG{n}{x\PYGZus{}raw}\PYG{p}{)}
+        \PYG{n}{x\PYGZus{}raw} \PYG{o}{=} \PYG{n}{x\PYGZus{}raw}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{n}{x\PYGZus{}raw} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{w\PYGZus{}raw\PYGZus{}in}\PYG{p}{(}\PYG{n}{x\PYGZus{}raw}\PYG{p}{)}
+        \PYG{n}{x} \PYG{o}{=} \PYG{n}{x\PYGZus{}raw}
+        \PYG{n}{x} \PYG{o}{=} \PYG{n}{x}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n}{x} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transformer}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+        \PYG{n}{x} \PYG{o}{=} \PYG{n}{x}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{w\PYGZus{}out}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+\end{Verbatim}

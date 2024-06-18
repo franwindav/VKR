@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+    \PYG{k}{def} \PYG{n+nf}{remove\PYGZus{}drift}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{):}
+        \PYG{n}{b}\PYG{p}{,} \PYG{n}{a} \PYG{o}{=} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{signal}\PYG{o}{.}\PYG{n}{butter}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}highpass\PYGZdq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{fs}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{signal}\PYG{o}{.}\PYG{n}{filtfilt}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{a}\PYG{p}{,} \PYG{n}{signal}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{notch}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{freq}\PYG{p}{,} \PYG{n}{sample\PYGZus{}frequency}\PYG{p}{):}
+        \PYG{n}{b}\PYG{p}{,} \PYG{n}{a} \PYG{o}{=} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{signal}\PYG{o}{.}\PYG{n}{iirnotch}\PYG{p}{(}\PYG{n}{freq}\PYG{p}{,} \PYG{l+m+mi}{30}\PYG{p}{,} \PYG{n}{sample\PYGZus{}frequency}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{signal}\PYG{o}{.}\PYG{n}{filtfilt}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{a}\PYG{p}{,} \PYG{n}{signal}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{notch\PYGZus{}harmonics}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{freq}\PYG{p}{,} \PYG{n}{sample\PYGZus{}frequency}\PYG{p}{):}
+        \PYG{k}{for} \PYG{n}{harmonic} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{8}\PYG{p}{):}
+            \PYG{n}{signal} \PYG{o}{=} \PYG{n}{notch}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{freq} \PYG{o}{*} \PYG{n}{harmonic}\PYG{p}{,} \PYG{n}{sample\PYGZus{}frequency}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{signal}
+
+    \PYG{k}{def} \PYG{n+nf}{apply\PYGZus{}to\PYGZus{}all}\PYG{p}{(}\PYG{n}{function}\PYG{p}{,} \PYG{n}{signal\PYGZus{}array}\PYG{p}{,} \PYG{o}{*}\PYG{n}{args}\PYG{p}{,} \PYG{o}{**}\PYG{n}{kwargs}\PYG{p}{):}
+        \PYG{n}{results} \PYG{o}{=} \PYG{p}{[]}
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{signal\PYGZus{}array}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]):}
+            \PYG{n}{results}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{function}\PYG{p}{(}\PYG{n}{signal\PYGZus{}array}\PYG{p}{[:,} \PYG{n}{i}\PYG{p}{],} \PYG{o}{*}\PYG{n}{args}\PYG{p}{,} \PYG{o}{**}\PYG{n}{kwargs}\PYG{p}{))}
+        \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{stack}\PYG{p}{(}\PYG{n}{results}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+\end{Verbatim}
